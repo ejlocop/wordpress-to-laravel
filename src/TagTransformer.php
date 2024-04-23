@@ -13,22 +13,22 @@ use League\Fractal\TransformerAbstract;
 
 class TagTransformer extends TransformerAbstract
 {
-    public function transform($post)
-    {
-        $embedded = collect($post->_embedded ?? []);
+	public function transform($post)
+	{
+		$embedded = collect($post->_embedded ?? []);
 
-        if ($embedded->has('wp:term')) {
+		if ($embedded->has('wp:term')) {
 
-            return $embedded->only('wp:term')
-                            ->flatten(2)
-                            ->where('taxonomy', 'post_tag')
-                            ->pluck('name')
-                            ->map(function ($tag) {
-                                return Str::title($tag);
-                            })
-                            ->toArray();
-        }
+			return $embedded->only('wp:term')
+				->flatten(2)
+				->where('taxonomy', 'post_tag')
+				->pluck('name')
+				->map(function ($tag) {
+					return Str::title($tag);
+				})
+				->toArray();
+		}
 
-        return [];
-    }
+		return [];
+	}
 }

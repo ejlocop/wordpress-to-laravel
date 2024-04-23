@@ -12,12 +12,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    protected $table   = 'post_categories';
+	protected $table = 'post_categories';
 
-    protected $guarded = ['id'];
+	protected $guarded = ['id'];
 
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
-    }
+	public function posts()
+	{
+		return $this->hasMany(Post::class);
+	}
 }

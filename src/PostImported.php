@@ -8,17 +8,16 @@
 
 namespace LeeOvery\WordpressToLaravel;
 
+
+
 class PostImported
 {
-    public $post;
-
-    /**
-     * PostImported constructor.
-     *
-     * @param $post
-     */
-    public function __construct($post)
-    {
-        $this->post = $post;
-    }
+	/**
+	 * PostImported constructor.
+	 *
+	 * @param $post
+	 */
+	public function __construct(public Post $post)
+	{
+	}
 }

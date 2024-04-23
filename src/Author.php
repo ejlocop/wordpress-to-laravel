@@ -12,12 +12,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Author extends Model
 {
-    protected $table   = 'post_author';
+	protected $table = 'post_author';
 
-    protected $guarded = ['id'];
+	protected $guarded = ['id'];
 
-    public function posts()
-    {
-        return $this->hasMany(Post::class);
-    }
+	public function posts()
+	{
+		return $this->hasMany(Post::class);
+	}
 }

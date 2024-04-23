@@ -10,15 +10,13 @@ namespace LeeOvery\WordpressToLaravel;
 
 class PostUpdated
 {
-    public $post;
 
-    /**
-     * PostUpdated constructor.
-     *
-     * @param $post
-     */
-    public function __construct($post)
-    {
-        $this->post = $post;
-    }
+	/**
+	 * PostUpdated constructor.
+	 *
+	 * @param $post
+	 */
+	public function __construct(public Post $post)
+	{
+	}
 }

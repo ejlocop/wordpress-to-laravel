@@ -12,24 +12,24 @@ use League\Fractal\TransformerAbstract;
 
 class AuthorTransformer extends TransformerAbstract
 {
-    public function transform($post)
-    {
-        $embedded = collect($post->_embedded ?? []);
+	public function transform($post)
+	{
+		$embedded = collect($post->_embedded ?? []);
 
-        if ($embedded->has('author')) {
+		if ($embedded->has('author')) {
 
-            $author = head($embedded['author']);
+			$author = head($embedded['author']);
 
-            return [
-                'wp_id'  => (int)$author->id,
-                'name'   => $author->name ?? null,
-                'slug'   => $author->slug ?? null,
-                'email'  => $author->email ?? null,
-                'avatar' => $author->avatar_urls->{96} ?? $author->avatar_urls->{48} ?? null,
-            ];
+			return [
+				'wp_id'  => (int)$author->id,
+				'name'   => $author->name ?? null,
+				'slug'   => $author->slug ?? null,
+				'email'  => $author->email ?? null,
+				'avatar' => $author->avatar_urls->{96} ?? $author->avatar_urls->{48} ?? null,
+			];
 
-        }
+		}
 
-        return [];
-    }
+		return [];
+	}
 }

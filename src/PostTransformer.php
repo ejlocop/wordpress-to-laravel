@@ -13,115 +13,97 @@ use League\Fractal\TransformerAbstract;
 
 class PostTransformer extends TransformerAbstract
 {
-    protected $defaultIncludes = [
-        'author',
-        'category',
-        'tags',
-    ];
+	protected array $defaultIncludes = [
+		'author',
+		'category',
+		'tags',
+	];
 
-    /**
-     * @var
-     */
-    private $authorTransformer;
+	/**
+	 * PostTransformer constructor.
+	 *
+	 * @param $authorTransformer
+	 * @param $categoryTransformer
+	 * @param $tagTransformer
+	 */
+	public function __construct(private $authorTransformer, private $categoryTransformer, private $tagTransformer)
+	{
+	}
 
-    /**
-     * @var
-     */
-    private $categoryTransformer;
+	public function transform($post)
+	{
+		return [
+			'wp_id'          => (int) $post->id,
+			'type'           => $post->type,
+			'title'          => $post->title->rendered,
+			'slug'           => $post->slug,
+			'link'           => $post->link,
+			'sticky'         => $post->sticky ?? 0,
+			'excerpt'        => $post->excerpt->rendered ?? '',
+			'content'        => $post->content->rendered ?? '',
+			'format'         => $post->format ?? null,
+			'status'         => $post->status,
+			'featured_image' => $this->getFeaturedImage($post),
+			'published_at'   => $this->carbonDate($post->date),
+			'created_at'     => $this->carbonDate($post->date),
+			'updated_at'     => $this->carbonDate($post->modified),
+		];
+	}
 
-    /**
-     * @var
-     */
-    private $tagTransformer;
+	private function getFeaturedImage($post)
+	{
+		$embedded = collect($post->_embedded ?? []);
 
-    /**
-     * PostTransformer constructor.
-     *
-     * @param $authorTransformer
-     * @param $categoryTransformer
-     * @param $tagTransformer
-     */
-    public function __construct($authorTransformer, $categoryTransformer, $tagTransformer)
-    {
-        $this->authorTransformer = $authorTransformer;
-        $this->categoryTransformer = $categoryTransformer;
-        $this->tagTransformer = $tagTransformer;
-    }
+		if ($embedded->has('wp:featuredmedia')) {
+			$media = head($embedded['wp:featuredmedia']);
 
-    public function transform($post)
-    {
-        return [
-            'wp_id'          => (int)$post->id,
-            'type'           => $post->type,
-            'title'          => $post->title->rendered,
-            'slug'           => $post->slug,
-            'link'           => $post->link,
-            'sticky'         => $post->sticky ?? 0,
-            'excerpt'        => $post->excerpt->rendered ?? '',
-            'content'        => $post->content->rendered ?? '',
-            'format'         => $post->format ?? null,
-            'status'         => $post->status,
-            'featured_image' => $this->getFeaturedImage($post),
-            'published_at'   => $this->carbonDate($post->date),
-            'created_at'     => $this->carbonDate($post->date),
-            'updated_at'     => $this->carbonDate($post->modified),
-        ];
-    }
+			if (isset($media->source_url)) {
+				return $media->source_url;
+			}
+		}
 
-    private function getFeaturedImage($post)
-    {
-        $embedded = collect($post->_embedded ?? []);
+		return null;
+	}
 
-        if ($embedded->has('wp:featuredmedia')) {
-            $media = head($embedded['wp:featuredmedia']);
+	/**
+	 * @param $date
+	 * @return Carbon
+	 */
+	private function carbonDate($date)
+	{
+		return Carbon::parse($date);
+	}
 
-            if (isset($media->source_url)) {
-                return $media->source_url;
-            }
-        }
+	/**
+	 * Include author
+	 *
+	 * @param $post
+	 * @return \League\Fractal\Resource\Item
+	 */
+	public function includeAuthor($post)
+	{
+		return $this->item($post, new $this->authorTransformer);
+	}
 
-        return null;
-    }
+	/**
+	 * Include category
+	 *
+	 * @param $post
+	 * @return \League\Fractal\Resource\Item
+	 */
+	public function includeCategory($post)
+	{
+		return $this->item($post, new $this->categoryTransformer);
+	}
 
-    /**
-     * @param $date
-     * @return Carbon
-     */
-    private function carbonDate($date)
-    {
-        return Carbon::parse($date);
-    }
-
-    /**
-     * Include author
-     *
-     * @param $post
-     * @return \League\Fractal\Resource\Item
-     */
-    public function includeAuthor($post)
-    {
-        return $this->item($post, new $this->authorTransformer);
-    }
-
-    /**
-     * Include category
-     *
-     * @param $post
-     * @return \League\Fractal\Resource\Item
-     */
-    public function includeCategory($post)
-    {
-        return $this->item($post, new $this->categoryTransformer);
-    }
-
-    /**
-     * Include tags
-     *
-     * @param $post
-     * @return \League\Fractal\Resource\Item
-     */
-    public function includeTags($post)
-    {
-        return $this->item($post, new $this->tagTransformer);
-    }
+	/**
+	 * Include tags
+	 *
+	 * @param $post
+	 * @return \League\Fractal\Resource\Item
+	 */
+	public function includeTags($post)
+	{
+		return $this->item($post, new $this->tagTransformer);
+	}
 }
